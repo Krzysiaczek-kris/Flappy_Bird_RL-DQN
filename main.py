@@ -14,7 +14,7 @@ action_size = env.action_space.n
 agent = DQNAgent(state_size, action_size)
 episodes = 50000
 batch_size = 128
-log_batch_size = 50
+log_batch_size = 10
 start = time.time()
 
 with open('training_log.csv', mode='w', newline='') as file:

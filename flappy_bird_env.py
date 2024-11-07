@@ -1,7 +1,7 @@
 import numpy as np
 import pygame
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 
 # Game Constants
 SCREEN_WIDTH = 288
@@ -19,13 +19,13 @@ BIRD_INITIAL_VELOCITY = 0
 BIRD_FLAP_VELOCITY = -9
 BIRD_GRAVITY = 1
 BIRD_X_POS = 50
-BIRD_COLOR = (255, 255, 0)
+BIRD_COLOR = (248, 240, 70)
 
 # Pipe Constants
 PIPE_WIDTH = 52
 PIPE_GAP_SIZE = 150
 PIPE_GAP_SIZE_HALF = PIPE_GAP_SIZE // 2
-PIPE_COLOR = (0, 255, 0)
+PIPE_COLOR = (104, 200, 79)
 PIPE_SPEED = 4
 PIPE_MIN_HEIGHT = 150
 PIPE_MAX_HEIGHT = 362
@@ -149,9 +149,9 @@ class FlappyBirdEnv(gym.Env):
         horizontal_distance = (self.pipe.x - BIRD_X_POS) * SCREEN_WIDTH_INV
         bird_velocity = self.bird_velocity * 0.1
         return np.array([
-            vertical_distance,
-            horizontal_distance,
-            bird_velocity
+            vertical_distance, # Vertical distance to the gap (height difference)
+            horizontal_distance, # Horizontal distance to the next pipe
+            bird_velocity # Bird's vertical velocity
         ], dtype=np.float32)
 
     def render(self, mode='human'):

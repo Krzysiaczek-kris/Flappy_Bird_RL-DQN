@@ -11,11 +11,13 @@ torch.backends.cudnn.benchmark = True # Improves performance for fixed input siz
 class DQNNet(nn.Module):
     def __init__(self, state_size, action_size):
         super(DQNNet, self).__init__()
-        self.layer1 = nn.Linear(state_size, 64)
-        self.layer2 = nn.Linear(64, 64)
+        self.input = nn.Linear(state_size, 128)
+        self.layer1 = nn.Linear(128, 128)
+        self.layer2 = nn.Linear(128, 64)
         self.output = nn.Linear(64, action_size)
 
     def forward(self, x):
+        x = torch.relu(self.input(x))
         x = torch.relu(self.layer1(x))
         x = torch.relu(self.layer2(x))
         return self.output(x)
@@ -101,12 +103,12 @@ class DQNAgent:
         self.beta = min(1.0, self.beta + self.beta_increment)
 
         states, actions, rewards, next_states, dones = zip(*samples)
-        states = torch.FloatTensor(states).to(self.device)
+        states = torch.FloatTensor(np.array(states)).to(self.device)
         actions = torch.LongTensor(actions).unsqueeze(1).to(self.device)
-        rewards = torch.FloatTensor(rewards).to(self.device)
-        next_states = torch.FloatTensor(next_states).to(self.device)
-        dones = torch.FloatTensor(dones).to(self.device)
-        weights = torch.FloatTensor(weights).unsqueeze(1).to(self.device)
+        rewards = torch.FloatTensor(np.array(rewards)).to(self.device)
+        next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
+        dones = torch.FloatTensor(np.array(dones)).to(self.device)
+        weights = torch.FloatTensor(np.array(weights)).unsqueeze(1).to(self.device)
 
         with torch.no_grad():
             next_actions = self.model(next_states).argmax(1).unsqueeze(1)
