@@ -10,7 +10,7 @@ SCREEN_WIDTH_INV = 1 / SCREEN_WIDTH
 SCREEN_HEIGHT = 512
 SCREEN_HEIGHT_HALF = SCREEN_HEIGHT // 2
 SCREEN_HEIGHT_INV = 1 / SCREEN_HEIGHT
-FPS = 30
+FPS = 60
 
 # Bird Constants
 BIRD_SIZE = 20
@@ -159,6 +159,7 @@ class FlappyBirdEnv(gym.Env):
             pygame.init()
             self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
             self.clock = pygame.time.Clock()
+            self.font = pygame.font.SysFont(None, 36)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -172,6 +173,9 @@ class FlappyBirdEnv(gym.Env):
         pygame.draw.rect(self.screen, PIPE_COLOR, lower_pipe_rect)
 
         pygame.draw.rect(self.screen, BIRD_COLOR, bird_rect)
+
+        score_text = self.font.render(f"Score: {self.score}", True, (255, 255, 255))
+        self.screen.blit(score_text, (10, 10))
 
         pygame.display.flip()
         self.clock.tick(FPS)
