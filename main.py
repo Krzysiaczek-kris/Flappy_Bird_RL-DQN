@@ -1,6 +1,6 @@
 # main.py
 import gymnasium as gym
-from flappy_bird_env import FlappyBirdEnv
+from flappy_bird_env import FlappyBirdEnv, MAX_SCORE
 from dqn_agent import DQNAgent
 import numpy as np
 import time
@@ -17,6 +17,8 @@ batch_size = 128
 log_batch_size = 10
 start = time.time()
 
+consecutive_max_scores = 0
+
 with open('training_log.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(['episode', 'reward', 'score', 'time'])
@@ -24,7 +26,6 @@ with open('training_log.csv', mode='w', newline='') as file:
 log_buffer = []
 
 for e in range(episodes):
-    
     state, _ = env.reset()
     state = np.reshape(state, [1, state_size])
     total_reward = 0
@@ -39,8 +40,17 @@ for e in range(episodes):
         total_reward += reward
 
     score = env.score
-    agent.replay(batch_size)
-    agent.update_target_network()
+
+    if score == MAX_SCORE:
+        consecutive_max_scores += 1
+        print(f"Episode {e+1}, Max Score Achieved! Consecutive Max Scores: {consecutive_max_scores}")
+        if consecutive_max_scores >= 100:
+            print("Agent has achieved maximum score for 100 consecutive episodes. Stopping training.")
+            break
+    else:
+        consecutive_max_scores = 0
+        agent.replay(batch_size)
+        agent.update_target_network()
 
     log_buffer.append([e + 1, total_reward, score, str(timedelta(seconds=time.time() - start))])
 
@@ -60,7 +70,6 @@ if log_buffer:
     with open('training_log.csv', mode='a', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(log_buffer)
-    log_buffer.clear()
 
 torch.save(agent.model.state_dict(), f"model.pth")
 print("Training complete.")

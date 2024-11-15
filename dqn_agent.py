@@ -11,13 +11,11 @@ torch.backends.cudnn.benchmark = True # Improves performance for fixed input siz
 class DQNNet(nn.Module):
     def __init__(self, state_size, action_size):
         super(DQNNet, self).__init__()
-        self.input = nn.Linear(state_size, 128)
-        self.layer1 = nn.Linear(128, 128)
-        self.layer2 = nn.Linear(128, 64)
-        self.output = nn.Linear(64, action_size)
+        self.layer1 = nn.Linear(state_size, 128)
+        self.layer2 = nn.Linear(128, 128)
+        self.output = nn.Linear(128, action_size)
 
     def forward(self, x):
-        x = torch.relu(self.input(x))
         x = torch.relu(self.layer1(x))
         x = torch.relu(self.layer2(x))
         return self.output(x)
