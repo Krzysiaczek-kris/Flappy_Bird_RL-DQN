@@ -21,7 +21,7 @@ consecutive_max_scores = 0
 
 with open('training_log.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(['episode', 'reward', 'score', 'time'])
+    writer.writerow(['episode', 'reward', 'score', 'steps', 'time'])
 
 log_buffer = []
 
@@ -30,10 +30,12 @@ for e in range(episodes):
     state = np.reshape(state, [1, state_size])
     total_reward = 0
     terminated = False
+    steps_in_episode = 0
 
     while not terminated:
         action = agent.act(state)
         next_state, reward, terminated, truncated, _ = env.step(action)
+        steps_in_episode += 1
         next_state = np.reshape(next_state, [1, state_size])
         agent.remember(state[0], action, reward, next_state[0], terminated)
         state = next_state
@@ -52,7 +54,13 @@ for e in range(episodes):
         agent.replay(batch_size)
         agent.update_target_network()
 
-    log_buffer.append([e + 1, total_reward, score, str(timedelta(seconds=time.time() - start))])
+    log_buffer.append([
+        e + 1,
+        total_reward,
+        score,
+        steps_in_episode,
+        str(timedelta(seconds=time.time() - start))
+    ])
 
     elapsed = time.time() - start
     print(f"Episode {e+1}, Reward: {total_reward}, Epsilon: {agent.epsilon:.6f}, Score: {score}, Time: {str(timedelta(seconds=elapsed))[:-4]}")
