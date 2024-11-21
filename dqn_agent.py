@@ -11,13 +11,13 @@ torch.backends.cudnn.benchmark = True # Improves performance for fixed input siz
 class DQNNet(nn.Module):
     def __init__(self, state_size, action_size):
         super(DQNNet, self).__init__()
-        self.layer1 = nn.Linear(state_size, 128)
-        self.layer2 = nn.Linear(128, 128)
-        self.output = nn.Linear(128, action_size)
+        self.input = nn.Linear(state_size, 256)
+        self.layer1 = nn.Linear(256, 256)
+        self.output = nn.Linear(256, action_size)
 
     def forward(self, x):
+        x = torch.relu(self.input(x))
         x = torch.relu(self.layer1(x))
-        x = torch.relu(self.layer2(x))
         return self.output(x)
 
 class PrioritizedReplayMemory:
@@ -65,7 +65,16 @@ class PrioritizedReplayMemory:
 
 class DQNAgent:
     def __init__(self, state_size, action_size):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        try: # Try to allocate on GPU if it fails, switch to CPU
+            self.model = DQNNet(state_size, action_size).to(self.device)
+        except RuntimeError as e:
+            if 'out of memory' in str(e):
+                print("CUDA out of memory. Switching to CPU.")
+                self.device = torch.device('cpu')
+                self.model = DQNNet(state_size, action_size).to(self.device)
+            else:
+                raise e
         self.state_size = state_size
         self.action_size = action_size
         self.memory = PrioritizedReplayMemory(50000)
@@ -75,7 +84,6 @@ class DQNAgent:
         self.epsilon_decay = 0.99
         self.beta = 0.4
         self.beta_increment = 1e-5
-        self.model = DQNNet(state_size, action_size).to(self.device)
         self.target_model = DQNNet(state_size, action_size).to(self.device)
         self.update_target_network()
         self.optimizer = optim.AdamW(self.model.parameters(), lr=0.001)
