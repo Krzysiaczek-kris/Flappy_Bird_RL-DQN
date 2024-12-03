@@ -31,7 +31,7 @@ PIPE_MIN_HEIGHT = 150
 PIPE_MAX_HEIGHT = 362
 
 # Game Settings
-MAX_SCORE = 1000
+MAX_SCORE = 500
 BACKGROUND_COLOR = (135, 206, 235)  # Sky blue
 
 # Reward Constants

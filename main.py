@@ -8,6 +8,8 @@ from datetime import timedelta
 import csv
 import torch
 
+torch.backends.cudnn.benchmark = True # Improves performance for fixed input size
+
 env = FlappyBirdEnv()
 state_size = env.observation_space.shape[0]
 action_size = env.action_space.n
@@ -46,8 +48,8 @@ for e in range(episodes):
     if score == MAX_SCORE:
         consecutive_max_scores += 1
         print(f"Episode {e+1}, Max Score Achieved! Consecutive Max Scores: {consecutive_max_scores}")
-        if consecutive_max_scores >= 100:
-            print("Agent has achieved maximum score for 100 consecutive episodes. Stopping training.")
+        if consecutive_max_scores >= 50:
+            print("Agent has achieved maximum score for 50 consecutive episodes. Stopping training.")
             break
     else:
         consecutive_max_scores = 0
@@ -71,8 +73,8 @@ for e in range(episodes):
             writer.writerows(log_buffer)
         log_buffer.clear()
 
-    if (e + 1) % 100 == 0:
-        torch.save(agent.model.state_dict(), f"model.pth")
+    # if (e + 1) % 100 == 0:
+    #     torch.save(agent.model.state_dict(), f"model.pth")
 
 if log_buffer:
     with open('training_log.csv', mode='a', newline='') as file:
