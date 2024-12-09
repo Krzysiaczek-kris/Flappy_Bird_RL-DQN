@@ -35,8 +35,8 @@ MAX_SCORE = 500
 BACKGROUND_COLOR = (135, 206, 235)  # Sky blue
 
 # Reward Constants
-ALIVE_REWARD = 0
-PIPE_PASS_REWARD = 10
+ALIVE_REWARD = 1 # reaching 1 score gives 86 rewards for staying alive
+PIPE_PASS_REWARD = 86
 DEATH_REWARD = -100
 
 class Pipe:

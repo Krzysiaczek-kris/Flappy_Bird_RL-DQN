@@ -6,7 +6,7 @@ import random
 import numpy as np
 from collections import deque
 
-torch.backends.cudnn.benchmark = True # Improves performance for fixed input size
+
 
 class DQNNet(nn.Module):
     def __init__(self, state_size, action_size):
